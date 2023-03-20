@@ -8,6 +8,7 @@
 #include<sys/wait.h>
 #include<unistd.h>
 #include<arpa/inet.h>
+#include <signal.h>
 
 #define PORT 1500//端口号 
 #define BACKLOG 5/*最大监听数*/ 
@@ -37,7 +38,7 @@ int main(){
     my_addr.sin_addr.s_addr=htonl(INADDR_ANY);/*IP，括号内容表示本机IP*/
     bzero(&(my_addr.sin_zero),8);/*将其他属性置0*/
     if(bind(sockfd,(struct sockaddr*)&my_addr,sizeof(struct sockaddr)) < 0){
-        printf("bind error");
+        printf("bind error\n");
         return -1;
     }
     
@@ -67,6 +68,7 @@ int main(){
 
 void communicate(void)
 {
+    int ret = 0;
     int fd_send = fork();
     if(fd_send == 0){
         send_loop();
@@ -77,14 +79,24 @@ void communicate(void)
         recv_loop();
     }
 
-    int status;
-    wait(&status);
+    // 检测到所有子进程都退出，父进程才退出
+    while (1) {
+        ret = wait(NULL);
+        if (ret == -1) {
+            if (errno == EINTR) continue; // 返回值为-1的时候有两种情况，一种是没有子进程了，还有一种是被中断了
+            break;
+        }
+        else if (ret == fd_send){
+            kill(fd_recv,SIGKILL);
+        }
+    }
 }
 
 void send_loop(void){
     char msg_buf_out[MAX_MSG];
     while(1){
-        scanf("%s",msg_buf_out);
+        // scanf("%s",msg_buf_out);
+        gets(msg_buf_out);
         if(strcmp(msg_buf_out,"exit") == 0) exit(0);
 
         int send_count = send(client_sock_fd,msg_buf_out,strlen(msg_buf_out),0);
@@ -107,6 +119,10 @@ void recv_loop(void){
         if(recv_count < 0){
             printf("recv error\n");
             continue;
+        }
+        else if(recv_count == 0){
+            printf("Client is offline\n");
+            exit(0);
         }
         printf("Client: %s\n",msg_buf_in);
         // printf("recv count: %d\n",recv_count);

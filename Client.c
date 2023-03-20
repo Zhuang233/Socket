@@ -8,6 +8,7 @@
 #include<sys/wait.h>
 #include<unistd.h>
 #include<arpa/inet.h>
+#include <signal.h>
 
  
 #define DEST_PORT 1500//目标地址端口号 
@@ -49,7 +50,7 @@ int main(){
 
 void communicate(void)
 {
-
+    int ret = 0;
     int fd_send = fork();
     if(fd_send == 0){
         send_loop();
@@ -60,15 +61,26 @@ void communicate(void)
         recv_loop();
     }
 
-    int status;
-    wait(&status);
+    // 检测到所有子进程都退出，父进程才退出
+    while (1) {
+        ret = wait(NULL);
+        if (ret == -1) {
+            if (errno == EINTR) continue; // 返回值为-1的时候有两种情况，一种是没有子进程了，还有一种是被中断了
+            break;
+        }
+        else if (ret == fd_send){
+            kill(fd_recv,SIGKILL);
+        }
+        
+    }
 }
 
 
 void send_loop(void){
     char msg_buf_out[MAX_MSG];
     while(1){
-        scanf("%s",msg_buf_out);
+        // scanf("%s",msg_buf_out);
+        gets(msg_buf_out);
         if(strcmp(msg_buf_out,"exit") == 0) exit(0);
 
         int send_count = send(sockfd,msg_buf_out,strlen(msg_buf_out),0);
@@ -90,6 +102,10 @@ void recv_loop(void){
         if(recv_count < 0){
             printf("recv error\n");
             continue;
+        }
+        else if(recv_count == 0){
+            printf("Server is offline\n");
+            exit(0);
         }
         printf("Server: %s\n",msg_buf_in);
         // printf("recv count: %d\n",recv_count);
