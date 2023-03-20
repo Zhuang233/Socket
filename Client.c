@@ -50,10 +50,10 @@ int main(){
 void communicate(void)
 {
 
-    // int fd_send = fork();
-    // if(fd_send == 0){
-    //     send_loop();
-    // }
+    int fd_send = fork();
+    if(fd_send == 0){
+        send_loop();
+    }
 
     int fd_recv = fork();
     if(fd_recv == 0){
@@ -64,14 +64,24 @@ void communicate(void)
     wait(&status);
 }
 
-// void send_loop(void){
-//     char msg_buf_out[MAX_MSG];
-//     while(1){
-//         scanf("%s",msg_buf_out);
-//         if(strcmp(msg_buf_out,"exit") == 0) exit(0);
-//         send(server_sock_fd,msg_buf_out,strlen(msg_buf_out),0);
-//     }
-// }
+
+void send_loop(void){
+    char msg_buf_out[MAX_MSG];
+    while(1){
+        scanf("%s",msg_buf_out);
+        if(strcmp(msg_buf_out,"exit") == 0) exit(0);
+
+        int send_count = send(sockfd,msg_buf_out,strlen(msg_buf_out),0);
+        if(send_count == -1)
+        {
+            printf("client send fail\n");
+        }
+        else{
+            // printf("client send success\nsend byte:%d\n",send_count);
+        }
+
+    }
+}
 
 void recv_loop(void){
     while(1){
@@ -81,8 +91,8 @@ void recv_loop(void){
             printf("recv error\n");
             continue;
         }
-        printf("%s\n",msg_buf_in);
-        printf("recv count: %d\n",recv_count);
+        printf("Server: %s\n",msg_buf_in);
+        // printf("recv count: %d\n",recv_count);
         fflush(stdout);
     }
 }

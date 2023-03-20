@@ -4,7 +4,7 @@ CC = gcc
 CFLAGS = -g -o
 BUILD_DIR = build
 
-all: $(BUILD_DIR) $(TARGETS) test
+all: $(BUILD_DIR) $(TARGETS)
 
 
 .PHONY : clean

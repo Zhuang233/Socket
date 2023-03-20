@@ -54,6 +54,9 @@ int main(){
         else{
             printf("receive success\n");
             communicate();
+            close(client_sock_fd);
+            close(sockfd);
+            break;
             // send(new_fd,"Hello World!",12,0);//发送内容，参数分别是连接句柄，内容，大小，其他信息（设为0即可） 
             }
     }
@@ -69,10 +72,10 @@ void communicate(void)
         send_loop();
     }
 
-    // int fd_recv = fork();
-    // if(fd_recv == 0){
-    //     recv_loop();
-    // }
+    int fd_recv = fork();
+    if(fd_recv == 0){
+        recv_loop();
+    }
 
     int status;
     wait(&status);
@@ -90,16 +93,23 @@ void send_loop(void){
             printf("server send fail\n");
         }
         else{
-            printf("server send success\nsend byte:%d\n",send_count);
+            // printf("server send success\nsend byte:%d\n",send_count);
         }
 
     }
 }
 
+
 void recv_loop(void){
-    char msg_buf_in[MAX_MSG];
     while(1){
-        recv(client_sock_fd,msg_buf_in,MAX_MSG,0);
-        printf("%s",msg_buf_in);
+        char msg_buf_in[MAX_MSG] = {};
+        int recv_count = recv(client_sock_fd,msg_buf_in,MAX_MSG,0);
+        if(recv_count < 0){
+            printf("recv error\n");
+            continue;
+        }
+        printf("Client: %s\n",msg_buf_in);
+        // printf("recv count: %d\n",recv_count);
+        fflush(stdout);
     }
 }
