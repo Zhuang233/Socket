@@ -1,8 +1,8 @@
 public class DataInfomation {
-    public String srcMac;
-    public String destMac;
+    public byte srcMac;
+    public byte destMac;
 
-    public DataInfomation(String srcMac, String destMac) {
+    public DataInfomation(byte srcMac, byte destMac) {
         this.srcMac = srcMac;
         this.destMac = destMac;
     }

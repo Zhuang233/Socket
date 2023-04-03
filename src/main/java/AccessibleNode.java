@@ -1,17 +1,22 @@
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.util.List;
 
-public class AccessibleNode extends Process{
-    int[] status = new int[32];
+public class AccessibleNode {
+    MobileNode p;
+    List<NodeInfomation> nodes;
+    final int AccessibleDistance = 5;
 
     //计算邻点
-    public void Caculate(){
-
+    public Boolean IsAccessible(Byte x, Byte y){
+        double dx = x - p.info.x;
+        double dy = y - p.info.y;
+        if (Math.sqrt(dx*dx+dy*dy) < AccessibleDistance)
+            return true;
+        return false;
     }
 
     //添加邻点
-    public void Add(){
-
+    public void Add(NodeInfomation node){
+        nodes.add(node);
     }
 
     //根据mac地址查询
@@ -24,33 +29,4 @@ public class AccessibleNode extends Process{
         return true;
     }
 
-    @Override
-    public OutputStream getOutputStream() {
-        return null;
-    }
-
-    @Override
-    public InputStream getInputStream() {
-        return null;
-    }
-
-    @Override
-    public InputStream getErrorStream() {
-        return null;
-    }
-
-    @Override
-    public int waitFor() {
-        return 0;
-    }
-
-    @Override
-    public int exitValue() {
-        return 0;
-    }
-
-    @Override
-    public void destroy() {
-
-    }
 }
