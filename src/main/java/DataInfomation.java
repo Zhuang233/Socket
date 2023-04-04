@@ -7,14 +7,12 @@ public class DataInfomation {
         this.destMac = destMac;
     }
 
-    public Byte getSrcMacByte() {
-        // Todo:Mac字符串转换为字节
-        return 1;
+    public byte getSrcMacByte() {
+        return srcMac;
     }
 
     public Byte getDestMacByte() {
-        // Todo:Mac字符串转换为字节
-        return 2;
+        return destMac;
     }
 
 }

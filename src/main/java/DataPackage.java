@@ -7,6 +7,8 @@ public class DataPackage {
     private String data;
     private String type;
     private DataInfomation infomation;
+    private byte x,y,mac;
+
 
     // 报文类型：数据帧，数据应答帧，交换地理位置帧，RTS帧，CTS帧
     public enum TYPE{DATA, ANSWER, EXCHANGE, RTS, CTS, FAIL}
@@ -133,13 +135,18 @@ public class DataPackage {
 
             //todo:
             infomation = new DataInfomation((byte) 0,(byte)0);
-
-
         }
         // CTS帧
         if(rawPackage[0] == (byte) TYPE.CTS.ordinal()){
             type = "CTS";
             infomation = new DataInfomation(rawPackage[2],rawPackage[1]);
+        }
+        // 地理位置交换帧
+        if(rawPackage[0] == (byte) TYPE.EXCHANGE.ordinal()){
+            type = "EXCHANGE";
+            x = rawPackage[2];
+            y = rawPackage[3];
+            mac = rawPackage[1];
         }
 
     }
@@ -159,6 +166,17 @@ public class DataPackage {
 
     public String getType() {
         return type;
+    }
+
+    public byte getX(){
+        return x;
+    }
+
+    public byte getY(){
+        return y;
+    }
+    public byte getMac(){
+        return mac;
     }
 
     public DataInfomation getInfomation() {

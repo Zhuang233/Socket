@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.time.LocalTime;
@@ -8,11 +9,12 @@ public class MobileNode extends Process{
     private int port;
     public byte mac;
     private ReceiveThread receiveThread;
-    private SendPackage sendPackage;
+    public SendPackage sendPackage;
+    public List<NodeInfomation> allNode;
     public  AccessibleNode accessibleNode;
     public List<SendStatus> sendStatusList;
     public NodeInfomation info;
-    public String status;
+    public int status;
 
     final int transmissionTime = 5;
 
@@ -36,8 +38,27 @@ public class MobileNode extends Process{
         return macs;
     }
 
+
     //信息展示
     public void ShowInfo(){
+        receiveThread.start();
+
+    }
+
+    public MobileNode(List<NodeInfomation> allNode, String ip, int port, byte mac) throws IOException {
+        this.allNode = allNode;
+        this.ip = ip;
+        this.port = port;
+        this.mac = mac;
+        this.status = 0;
+        this.info = new NodeInfomation();
+        this.info.ip = ip;
+        this.info.port = port;
+        this.info.mac = mac;
+        this.receiveThread = new ReceiveThread(this);
+        this.sendPackage = new SendPackage(this);
+        this.accessibleNode = new AccessibleNode(this);
+
 
     }
 
